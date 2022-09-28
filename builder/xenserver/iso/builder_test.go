@@ -3,7 +3,7 @@ package iso
 import (
 	"reflect"
 	"testing"
-
+	"strings"
 	"github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer-plugin-sdk/common"
 )
@@ -15,7 +15,7 @@ func testConfig() map[string]interface{} {
 		"remote_username":   "admin",
 		"remote_password":   "admin",
 		"vm_name":           "foo",
-		"iso_checksum":      "foo",
+		"iso_checksum":      "md5:A221725EE181A44C67E25BD6A2516742",
 		"iso_url":           "http://www.google.com/",
 		"shutdown_command":  "yes",
 		"ssh_username":      "foo",
@@ -191,77 +191,61 @@ func TestBuilderPrepare_ISOChecksum(t *testing.T) {
 	}
 
 	// Test good
-	config["iso_checksum"] = "FOo"
-	b = Builder{}
-	_, warns, err = b.Prepare(config)
-	if len(warns) > 0 {
-		t.Fatalf("bad: %#v", warns)
-	}
-	if err != nil {
-		t.Fatalf("should not have error: %s", err)
+	good_checksums := []string {
+		"sha512:1F0E0CE0036C7EAACA84ECB41A93F352029B3BAFDF83E9E469E5E26980075231C553ABA90E5687E36F63F05915C317D8FA4BE33BBC505112BA64FFD754D382A1",
+		"1F0E0CE0036C7EAACA84ECB41A93F352029B3BAFDF83E9E469E5E26980075231C553ABA90E5687E36F63F05915C317D8FA4BE33BBC505112BA64FFD754D382A1",
+		"sha256:BA4F78A4C2E928D49829AABFBF204305D6D24C7F189DD071CDE25A4D490F1219",
+		"BA4F78A4C2E928D49829AABFBF204305D6D24C7F189DD071CDE25A4D490F1219",
+		"sha1:69F180CA9D93DAE6670360F38D0E7D6228993F7E",
+		"69F180CA9D93DAE6670360F38D0E7D6228993F7E",
+		"md5:A221725EE181A44C67E25BD6A2516742",
+		"A221725EE181A44C67E25BD6A2516742",
+		"none",
 	}
 
-	if b.config.ISOChecksum != "foo" {
-		t.Fatalf("should've lowercased: %s", b.config.ISOChecksum)
+	for _, good_checksum := range good_checksums {
+		config["iso_checksum"] = good_checksum
+		b = Builder{}
+		_, warns, err = b.Prepare(config)
+		if len(warns) > 0 {
+			t.Fatalf("%s bad: %#v", good_checksum, warns)
+		}
+		if err != nil {
+			t.Fatalf("%s should not have checksum error: %s", good_checksum, err)
+		}
+		config["iso_checksum"] = "BLAH"
+
+		//make sure lower case works too
+		config["iso_checksum"] = strings.ToLower(good_checksum)
+		b = Builder{}
+		_, warns, err = b.Prepare(config)
+		if len(warns) > 0 {
+			t.Fatalf("%s bad: %#v", good_checksum, warns)
+		}
+		if err != nil {
+			t.Fatalf("%s should not have checksum error: %s", good_checksum, err)
+		}
+		config["iso_checksum"] = "BLAH"
 	}
+
 }
 
-func TestBuilderPrepare_ISOChecksumType(t *testing.T) {
+func TestBuilderPrepare_ISOChecksumTypeDeprecation(t *testing.T) {
 	var b Builder
 	config := testConfig()
 
-	// Test bad
-	config["iso_checksum_type"] = ""
+	config["iso_checksum_type"] = "md5"
 	_, warns, err := b.Prepare(config)
 	if len(warns) > 0 {
 		t.Fatalf("bad: %#v", warns)
 	}
+
 	if err == nil {
-		t.Fatal("should have error")
+		t.Fatalf("should have error")
 	}
 
-	// Test good
-	config["iso_checksum_type"] = "mD5"
-	b = Builder{}
-	_, warns, err = b.Prepare(config)
-	if len(warns) > 0 {
-		t.Fatalf("bad: %#v", warns)
-	}
-	if err != nil {
-		t.Fatalf("should not have error: %s", err)
-	}
-
-	if b.config.ISOChecksumType != "md5" {
-		t.Fatalf("should've lowercased: %s", b.config.ISOChecksumType)
-	}
-
-	// Test unknown
-	config["iso_checksum_type"] = "fake"
-	b = Builder{}
-	_, warns, err = b.Prepare(config)
-	if len(warns) > 0 {
-		t.Fatalf("bad: %#v", warns)
-	}
-	if err == nil {
-		t.Fatal("should have error")
-	}
-
-	// Test none
-	config["iso_checksum_type"] = "none"
-	b = Builder{}
-	_, warns, err = b.Prepare(config)
-	// @todo: give warning in this case?
-	/*
-		if len(warns) == 0 {
-			t.Fatalf("bad: %#v", warns)
-		}
-	*/
-	if err != nil {
-		t.Fatalf("should not have error: %s", err)
-	}
-
-	if b.config.ISOChecksumType != "none" {
-		t.Fatalf("should've lowercased: %s", b.config.ISOChecksumType)
+	if ! strings.Contains(err.Error(), "Deprecated configuration key: 'iso_checksum_type'.") {
+		t.Fatalf("No deprecration error found: %s", err)
 	}
 }
 

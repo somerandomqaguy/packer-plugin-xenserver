@@ -114,18 +114,24 @@ func (self *Builder) Prepare(raws ...interface{}) (params []string, warns []stri
 	}
 
 	if self.config.ISOName == "" {
-		// If ISO name is not specified, assume a URL and checksum has been provided. These will be validated by the SDK isoconfig.
-		iso_config := commonsteps.ISOConfig {
-			ISOChecksum: self.config.ISOChecksum,
-			RawSingleISOUrl: self.config.ISOUrl,
-			ISOUrls: self.config.ISOUrls,
-		}
+		// If ISO name is not specified, assume a URL and checksum has been provided.
+		if self.config.ISOUrl == "" && len(self.config.ISOUrls) == 0 {
+			errs = packer.MultiErrorAppend(
+				errs, fmt.Errorf("You must specify either iso_name, or one of iso_url/iso_urls : %s", err))
+		} else {
+			// Let the SDK validate what it can take.
+			iso_config := commonsteps.ISOConfig {
+				ISOChecksum: self.config.ISOChecksum,
+				RawSingleISOUrl: self.config.ISOUrl,
+				ISOUrls: self.config.ISOUrls,
+			}
 
-		_, iso_errs := iso_config.Prepare(nil)
-		if iso_errs != nil {
-		        for _, this_err := range iso_errs {
-		                errs = packer.MultiErrorAppend(this_err)
-		        }
+			_, iso_errs := iso_config.Prepare(nil)
+			if iso_errs != nil { //this prepare returns an error array.
+				for _, iso_err := range iso_errs {
+						errs = packer.MultiErrorAppend(errs, iso_err)
+				}
+			}
 		}
 	} else {
 

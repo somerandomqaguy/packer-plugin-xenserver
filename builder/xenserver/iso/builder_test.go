@@ -179,16 +179,40 @@ func TestBuilderPrepare_InvalidKey(t *testing.T) {
 func TestBuilderPrepare_ISOChecksum(t *testing.T) {
 	var b Builder
 	config := testConfig()
+	var warns []string
+	var err error
 
-	// Test bad
+	// Test bad with empty iso_checksum string
 	config["iso_checksum"] = ""
-	_, warns, err := b.Prepare(config)
+	b = Builder{}
+	_, warns, err = b.Prepare(config)
 	if len(warns) > 0 {
 		t.Fatalf("bad: %#v", warns)
 	}
 	if err == nil {
-		t.Fatal("should have error")
+		t.Fatalf("should have checksum error with an empty string: %s", err)
 	}
+
+	// Test bad
+	bad_checksums := []string {
+		"md5:A221725EE181A44C6742BAD",
+		"A221725EE181A44C6742BAD",
+		"Z221725EE181A44C67E25BD6A2516BAD",
+	}
+
+	for _, bad_checksum := range bad_checksums {
+		config["iso_checksum"] = bad_checksum
+		b = Builder{}
+		_, warns, err = b.Prepare(config)
+		if len(warns) > 0 {
+			t.Fatalf("%s bad: %#v", bad_checksum, warns)
+		}
+		if err == nil {
+			t.Fatalf("%s should have checksum error: %s", bad_checksum, err)
+		}
+		config["iso_checksum"] = "BLAH"
+	}
+
 
 	// Test good
 	good_checksums := []string {
@@ -227,7 +251,6 @@ func TestBuilderPrepare_ISOChecksum(t *testing.T) {
 		}
 		config["iso_checksum"] = "BLAH"
 	}
-
 }
 
 func TestBuilderPrepare_ISOChecksumTypeDeprecation(t *testing.T) {

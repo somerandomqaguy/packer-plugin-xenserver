@@ -117,7 +117,7 @@ func (self *Builder) Prepare(raws ...interface{}) (params []string, warns []stri
 		// If ISO name is not specified, assume a URL and checksum has been provided.
 		if self.config.ISOUrl == "" && len(self.config.ISOUrls) == 0 {
 			errs = packer.MultiErrorAppend(
-				errs, fmt.Errorf("You must specify either iso_name, or one of iso_url/iso_urls : %s", err))
+				errs, errors.New("You must specify either iso_name, or one of iso_url/iso_urls"))
 		} else {
 			// Let the SDK validate what it can take.
 			iso_config := commonsteps.ISOConfig {
@@ -134,7 +134,10 @@ func (self *Builder) Prepare(raws ...interface{}) (params []string, warns []stri
 			}
 		}
 	} else {
-
+		if self.config.ISOUrl != "" || len(self.config.ISOUrls) != 0 {
+			errs = packer.MultiErrorAppend(
+				errs, errors.New("Both iso_name and iso_url(s) is set, you must pick one or the other"))
+		}
 		// An ISO name has been provided. It should be attached from an available SR.
 
 	}

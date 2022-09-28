@@ -317,16 +317,37 @@ func TestBuilderPrepare_ISOUrl(t *testing.T) {
 
 }
 
-func TestBuilderPrepare_ISONameTakesPrecedence(t *testing.T) {
+func TestBuilderPrepare_ISOName(t *testing.T) {
 	var b Builder
 	config := testConfig()
 	config["iso_name"] = "my_iso"
-	config["iso_url"] = "http://www.packer.io"
-	config["iso_urls"] = []string{"http://www.packer.io"}
 
 	b = Builder{}
 	_, warns, err := b.Prepare(config)
-	// We shouldn't test iso_url if iso_name is set.
+
+	//error out if iso_url or iso_name are set.
+	if len(warns) > 0 {
+		t.Fatalf("bad: %#v", warns)
+	}
+	if err == nil {
+		t.Errorf("should have error: %s", err)
+	}
+
+	delete(config, "iso_url")
+	config["iso_urls"] = []string{"http://www.hashicorp.com"}
+	b = Builder{}
+	_, warns, err = b.Prepare(config)
+	if len(warns) > 0 {
+		t.Fatalf("bad: %#v", warns)
+	}
+	if err == nil {
+		t.Errorf("should have error: %s", err)
+	}
+
+	// test good
+	delete(config, "iso_urls")
+	b = Builder{}
+	_, warns, err = b.Prepare(config)
 	if len(warns) > 0 {
 		t.Fatalf("bad: %#v", warns)
 	}

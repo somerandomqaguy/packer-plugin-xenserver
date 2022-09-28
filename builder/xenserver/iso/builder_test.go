@@ -278,9 +278,6 @@ func TestBuilderPrepare_ISOUrl(t *testing.T) {
 	}
 
 	expected := []string{"http://www.packer.io"}
-	if !reflect.DeepEqual(b.config.ISOUrls, expected) {
-		t.Fatalf("bad: %#v", b.config.ISOUrls)
-	}
 
 	// Test both set
 	config["iso_url"] = "http://www.packer.io"
@@ -316,6 +313,25 @@ func TestBuilderPrepare_ISOUrl(t *testing.T) {
 	}
 	if !reflect.DeepEqual(b.config.ISOUrls, expected) {
 		t.Fatalf("bad: %#v", b.config.ISOUrls)
+	}
+
+}
+
+func TestBuilderPrepare_ISONameTakesPrecedence(t *testing.T) {
+	var b Builder
+	config := testConfig()
+	config["iso_name"] = "my_iso"
+	config["iso_url"] = "http://www.packer.io"
+	config["iso_urls"] = []string{"http://www.packer.io"}
+
+	b = Builder{}
+	_, warns, err := b.Prepare(config)
+	// We shouldn't test iso_url if iso_name is set.
+	if len(warns) > 0 {
+		t.Fatalf("bad: %#v", warns)
+	}
+	if err != nil {
+		t.Errorf("should not have error: %s", err)
 	}
 }
 

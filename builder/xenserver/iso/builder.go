@@ -30,6 +30,7 @@ func (self *Builder) Prepare(raws ...interface{}) (params []string, warns []stri
 	var errs *packer.MultiError
 
 	err := hconfig.Decode(&self.config, &hconfig.DecodeOpts{
+		PluginType: xscommon.BuilderId,
 		Interpolate: true,
 		InterpolateFilter: &interpolate.RenderFilter{
 			Exclude: []string{

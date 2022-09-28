@@ -16,7 +16,6 @@ func testConfig() map[string]interface{} {
 		"remote_password":   "admin",
 		"vm_name":           "foo",
 		"iso_checksum":      "foo",
-		"iso_checksum_type": "md5",
 		"iso_url":           "http://www.google.com/",
 		"shutdown_command":  "yes",
 		"ssh_username":      "foo",

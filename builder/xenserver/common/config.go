@@ -22,7 +22,6 @@ type Config struct {
 	VMOtherConfig  map[string]string `mapstructure:"vm_other_config"`
 
 	ISOChecksum     string   `mapstructure:"iso_checksum"`
-	ISOChecksumType string   `mapstructure:"iso_checksum_type"`
 	ISOUrls         []string `mapstructure:"iso_urls"`
 	ISOUrl          string   `mapstructure:"iso_url"`
 	ISOName         string   `mapstructure:"iso_name"`

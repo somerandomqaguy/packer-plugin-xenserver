@@ -96,7 +96,6 @@ func (self *Builder) Prepare(raws ...interface{}) (params []string, warns []stri
 	templates := map[string]*string{
 		"clone_template":    &self.config.CloneTemplate,
 		"iso_checksum":      &self.config.ISOChecksum,
-		"iso_checksum_type": &self.config.ISOChecksumType,
 		"iso_url":           &self.config.ISOUrl,
 		"iso_name":          &self.config.ISOName,
 		"install_timeout":   &self.config.RawInstallTimeout,

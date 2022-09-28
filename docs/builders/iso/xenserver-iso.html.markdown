@@ -43,11 +43,15 @@ each category, the available options are alphabetized and described.
   If this is an HTTP URL, Packer will download it and cache it between
   runs.
 
+<!-- Transferred to config file-->
 * `remote_host` (string) - The host of the Xenserver / XCP-ng pool primary. Typically these will be specified through environment variables as seen in the [examples](../../examples/centos8.json).
 
+<!-- Transferred to config file-->
 * `remote_username` (string) - The XenServer username used to access the remote machine.
 
+<!-- Transferred to config file-->
 * `remote_password` (string) - The XenServer password for access to the remote machine.
+
 
 * `ssh_username` (string) - The username to use to SSH into the machine
   once the OS is installed.
@@ -73,6 +77,7 @@ each category, the available options are alphabetized and described.
   run `xe template-list`. Setting the correct value hints to XenServer how to
   optimize the virtual hardware to work best with that operating system.
 
+<!-- Transferred to config file-->
 * `disk_size` (integer) - The size, in megabytes, of the hard disk to create
   for the VM. By default, this is 40000 (about 40 GB).
 
@@ -117,6 +122,7 @@ each category, the available options are alphabetized and described.
   must point to the same file (same checksum). By default this is empty
   and `iso_url` is used. Only one of `iso_url` or `iso_urls` can be specified.
 
+<!-- Transferred to config file-->
 * `keep_vm` (string) - Determine when to keep the VM and when to clean it up. This
   can be "always", "never" or "on_success". By default this is "never", and Packer
   always deletes the VM regardless of whether the process succeeded and an artifact
@@ -135,6 +141,7 @@ each category, the available options are alphabetized and described.
   By default this is "output-BUILDNAME" where "BUILDNAME" is the name
   of the build.
 
+<!-- Transferred to config file-->
 * `platform_args` (object of key/value strings) - The platform args.
   Defaults to 
 ```javascript
@@ -175,22 +182,28 @@ each category, the available options are alphabetized and described.
   available. By default this is "20m", or 20 minutes. Note that this should
   be quite long since the timer begins as soon as the virtual machine is booted.
 
+<!-- Transferred to config file-->
 * `tools_iso_name` (string) - The name of the XenServer Tools ISO. Defaults to
   "xs-tools.iso".
 
+<!-- Transferred to config file-->
 * `vm_description` (string) - The description of the new virtual
   machine. By default this is the empty string.
 
+<!-- Transferred to config file-->
 * `vm_name` (string) - This is the name of the new virtual
   machine, without the file extension. By default this is
   "packer-BUILDNAME-TIMESTAMP", where "BUILDNAME" is the name of the build.
 
+<!-- Transferred to config file-->
 * `vcpus_max` (integer) - The maximum number of VCPUs for the VM.
   By default this is 1.
 
+<!-- Transferred to config file-->
 * `vcpus_atstartup` (integer) - The number of startup VCPUs for the VM.
   By default this is 1.
 
+<!-- Transferred to config file-->
 * `vm_memory` (integer) - The size, in megabytes, of the amount of memory to
   allocate for the VM. By default, this is 1024 (1 GB).
 

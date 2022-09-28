@@ -1,3 +1,5 @@
+//go:generate packer-sdc struct-markdown
+
 package common
 
 import (
@@ -13,14 +15,26 @@ import (
 )
 
 type CommonConfig struct {
-	Username string `mapstructure:"remote_username"`
-	Password string `mapstructure:"remote_password"`
-	HostIp   string `mapstructure:"remote_host"`
-
+	// The XenServer username used to access the remote machine.
+	Username string `mapstructure:"remote_username" required:"true"`
+	// The XenServer password for access to the remote machine.
+	Password string `mapstructure:"remote_password" required:"true"`
+	// (string) - The host of the Xenserver / XCP-ng pool primary.
+	// Typically these will be specified through environment variables as seen in the
+	// [examples](../../examples/centos8.json).
+	HostIp   string `mapstructure:"remote_host" required:"true"`
+	// This is the name of the new virtual
+	// machine, without the file extension. By default this is
+	// "packer-BUILDNAME-TIMESTAMP", where "BUILDNAME" is the name of the build.
 	VMName             string   `mapstructure:"vm_name"`
+	// The description of the new virtual
+	// machine. By default this is the empty string.
 	VMDescription      string   `mapstructure:"vm_description"`
-	SrName             string   `mapstructure:"sr_name"`
-	SrISOName          string   `mapstructure:"sr_iso_name"`
+	// The name of the SR to packer will save the built VM to
+	SrName             string   `mapstructure:"sr_name" required:"true"`
+	// The ISO-SR to packer will use. The ISO will be uploaded to the SR.
+	SrISOName          string   `mapstructure:"sr_iso_name" required:"true"`
+
 	FloppyFiles        []string `mapstructure:"floppy_files"`
 	NetworkNames       []string `mapstructure:"network_names"`
 	ExportNetworkNames []string `mapstructure:"export_network_names"`
@@ -34,6 +48,7 @@ type CommonConfig struct {
 	RawBootWait string `mapstructure:"boot_wait"`
 	BootWait    time.Duration
 
+	// The name of the XenServer Tools ISO. Defaults to "xs-tools.iso".
 	ToolsIsoName string `mapstructure:"tools_iso_name"`
 
 	HTTPDir     string `mapstructure:"http_directory"`
@@ -53,7 +68,15 @@ type CommonConfig struct {
 
 	OutputDir string `mapstructure:"output_directory"`
 	Format    string `mapstructure:"format"`
+	// Determine when to keep the VM and when to clean it up. This
+	// can be "always", "never" or "on_success". By default this is "never", and Packer
+	// always deletes the VM regardless of whether the process succeeded and an artifact
+	// was produced. "always" asks Packer to leave the VM at the end of the process
+	// regardless of success. "on_success" requests that the VM only be cleaned up if an
+	// artifact was produced. The latter is useful for debugging templates that fail.
 	KeepVM    string `mapstructure:"keep_vm"`
+
+
 	IPGetter  string `mapstructure:"ip_getter"`
 }
 
